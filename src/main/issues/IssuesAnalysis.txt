@@ -1,0 +1,5 @@
+Issues:
+
+1.Identify Data Quality Issues:
+       -Null or inconsistent values.
+       -Ensure numeric and date fields are formatted properly.
