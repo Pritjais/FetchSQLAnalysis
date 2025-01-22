@@ -1,0 +1,28 @@
+THIRD Section: COMMUNICATE WITH STAKEHOLDERS
+To this I will be writing an email to my Manager (Peter), letting him know about my analysis.
+
+Subject: Data Investigation Summary and Next Steps
+Hello Peter,
+I hope this message finds you well. I’ve completed a preliminary analysis of the data and wanted to share a summary of findings, an interesting trend, and recommendations for the next steps.
+Key Data Quality Issues and Questions
+1.	Placeholder and Inconsistent Values: Fields like MANUFACTURER contain placeholder values (e.g., "PLACEHOLDER MANUFACTL") and inconsistent formatting (e.g., capitalization and spacing variations).
+Question: Do we have a standard for handling such placeholders, or should they be excluded in analysis?
+2.	Missing Relationships: 17,603 user records in the transactions table lack corresponding entries in the user table, and 4,467 product barcodes in the transactions do not match the product table.
+Question: Can we validate the completeness of user and product datasets or identify gaps in the source systems?
+3.	Ambiguous Hierarchies: The relationship between CATEGORY_1 to CATEGORY_4 is unclear, making it difficult to understand how they align (e.g., hierarchy or separate dimensions).
+Question: Do we have documentation or a business explanation for how these categories are structured?
+
+Interesting Trend in the Data:
+Seasonality in Sales: Total sales show a significant spike in July, likely influenced by seasonal promotions and holidays. This trend highlights the importance of targeting campaigns around peak shopping periods.
+Generational Insights in Health & Wellness: The Millennials generation accounts 57.27 % of total sales in the "Health & Wellness" category, outperforming all other generations. This suggests a strong preference among Millennials for products in this category, providing a clear direction for targeted marketing efforts
+
+Request for Action:
+Metadata and Documentation: Can we get additional context for key fields like CATEGORY_1 to CATEGORY_4, FINAL_SALE, and FINAL_QUANTITY to better understand their definitions and intended use?
+Data Validation: Can the relevant teams confirm the integrity of the user and product data, ensuring all entities referenced in transactions are present in their respective tables?
+Data Cleanup Support: What guidance or tools can be provided to handle placeholder values and formatting inconsistencies in fields like MANUFACTURER?
+
+Your input will help address these issues and enable us to unlock actionable insights from this dataset. Let me know if we can arrange a quick follow-up to discuss.
+Looking forward to your thoughts!
+Best regards,
+Priti
+

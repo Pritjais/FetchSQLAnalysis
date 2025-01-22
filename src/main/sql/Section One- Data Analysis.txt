@@ -1,0 +1,125 @@
+
+
+FIRST SECTION
+
+Are there any data quality issues present?
+
+Answer:
+
+1.Duplicate Transactions
+There are duplicate records in the dataset for certain receipt_id values. For these duplicate records:
+-One record contains a NULL value for final_sale, while another has a valid entry for the same.
+-This suggests the need to deduplicate the table by retaining distinct records that contain complete data across all columns.
+
+
+SQL query for the analysis:
+
+SELECT  count(distinct receipt_id) FROM "TRANSACTION_TAKEHOME"
+--24440
+Sql: select count(receipt_id) from
+(SELECT  receipt_id, count(*)  FROM "TRANSACTION_TAKEHOME" group by receipt_id having count(*) > 1
+)aa;
+
+
+2. Inconsistent Data in final_quantity Column
+-There are 12,500 records where the final_quantity column has character values such as 'zero'. This column should only accept integers as the data type.
+-Additionally, final_quantity should not have decimal or floating-point values, as sales item quantities are generally integers.
+Mixing numeric and text values can lead to errors during calculations or aggregations.
+
+SQL query for the analysis:
+SELECT COUNT(*)
+FROM "TRANSACTION_TAKEHOME"
+WHERE final_quantity LIKE 'zero';
+
+3. Mismatch Between purchase_date and scan_date
+-26,178 records have discrepancies between purchase_date (a DATE field) and scan_date (a DATETIME field). These two fields should align, as the scan should occur on the same day as the purchase.
+-If SCAN_DATE is earlier than PURCHASE_DATE, it indicates potential errors during data entry.
+
+SQL query for the analysis:
+SELECT COUNT(*)
+FROM "TRANSACTION_TAKEHOME"
+WHERE DATE(scan_date) <> purchase_date;
+
+
+4. Missing user_id in the Users Table
+-17,603 user records in the TRANSACTION_TAKEHOME table do not have corresponding entries in the USER_TAKEHOME table.
+-This violates the foreign key relationship between transactions and users. All user IDs in the transactions table should be present in the users' primary table.
+
+
+SQL query for the analysis:
+SELECT COUNT(DISTINCT ut.user_id)
+FROM TRANSACTION_TAKEHOME ut
+WHERE ut.user_id NOT IN (
+    SELECT DISTINCT id
+    FROM USER_TAKEHOME
+);
+
+5. Missing barcode in the Products Table
+-4,467 records in the TRANSACTION_TAKEHOME table have barcode values that are not present in the PRODUCTS_TAKEHOME table.
+-This violates the foreign key relationship between transactions and products.
+
+SQL query for the analysis:
+SELECT COUNT(DISTINCT ut.barcode)
+FROM TRANSACTION_TAKEHOME ut
+WHERE ut.barcode NOT IN (
+    SELECT DISTINCT barcode
+    FROM PRODUCTS_TAKEHOME
+);
+
+
+
+Are there any fields that are challenging to understand?
+
+1.Placeholder or Missing Values
+The MANUFACTURER column contains placeholder or unclear values such as "PLACEHOLDER MANUFACTL" or "NONE".
+These placeholder values hinder interpretability and reduce the reliability of insights derived from the data.
+2. Granularity and Ambiguity in Categories
+Columns like CATEGORY_3 and CATEGORY_4 include highly specific terms (e.g., "Cheese Curls & Puffs") that may not align well with broader categories.
+The hierarchical relationship between CATEGORY_1, CATEGORY_2, CATEGORY_3, and CATEGORY_4 is unclear. For example, it is not specified whether they are subcategories or independent dimensions.
+Lack of clarity in the relationships between category columns makes it difficult to understand and analyze the data accurately.
+3.Lack of Unique Identifiers
+The dataset does not contain a clear unique identifier for each row or product.
+While the BARCODE column might serve this purpose, its role is not explicitly documented. Additionally, if BARCODE values are missing for some rows, it further complicates tracking and ensuring data consistency.
+Without a defined unique identifier, operations like deduplication, data merging, or tracing individual records become challenging.
+
+
+4. Inconsistent or Non-Standardized Formats
+The MANUFACTURER column has inconsistent capitalization and spacing, such as:
+"COLGATE-PALMOLIVE" vs. "MAPLE HOLISTICS AND HON" .
+These inconsistencies can create issues during data aggregation, grouping, or filtering, potentially leading to inaccurate results.
+
+5. Missing Context for Data Relationships
+The relationships between key columns like CATEGORY_1 to CATEGORY_4 are not explained. It is unclear if they are hierarchically linked or represent separate categorization dimensions.
+This lack of metadata limits the ability to understand and utilize these fields effectively for categorization or analysis.
+6.Unclear Definitions of Transaction Fields
+The FINAL_SALE column likely represents the total sales amount, but it lacks clarification about the currency (e.g., USD).
+If the dataset spans multiple regions or countries, this could lead to inconsistencies in financial analysis.
+Without clearly defining whether FINAL_SALE is regional or global and what currency it refers to, analysis and reporting could yield misleading outcomes.
+7. Unclear Data Completeness
+The completeness of the data is uncertain:-
+-It is not clear whether all products in the receipts are accounted for in the dataset.
+-There is no confirmation that every transaction is captured.
+-The FINAL_QUANTITY column may include ambiguous cases, such as fractional quantities for weighed items like produce, but this is not explicitly stated.
+Uncertainty in data completeness and column definitions makes it difficult to determine if the dataset is reliable for decision-making.
+
+Suggestions to Improve Data Understanding:
+1.	Normalize and Standardize Data:
+•	Ensure consistent capitalization and remove placeholders like "NONE."
+2.	Add Metadata:
+•	Provide a clear description of column relationships (e.g., is CATEGORY_4 always a subcategory of CATEGORY_3?).
+3.	Handle Missing Values:
+•	Replace placeholder data with meaningful or interpolated values.
+4.	Identify Unique Keys:
+•	Confirm whether BARCODE or another column can serve as a unique identifier.
+5.	Aggregate Data:
+•	Collapse repetitive categories into broader, more meaningful groupings for easier understanding.
+
+USERS:
+There is a record in Users table where the created_date is after the Birth_date of the user. How is it possible?
+SELECT * FROM USER_TAKEHOME ut where birth_date >= created_date
+Missing or Ambiguous Context
+•	The STATE column uses abbreviations (e.g., "CA," "PA"), but there’s no metadata to confirm whether these refer to U.S. states or other regions.
+•	The LANGUAGE column contains codes like es-419 and en, which may not be immediately clear without a mapping to full language names.
+The CREATED_DATE and BIRTH_DATE columns have timestamps in ISO 8601 format with millisecond precision. This level of detail may not be necessary and could complicate comparisons or aggregations. Its irrelevant.
+
+
