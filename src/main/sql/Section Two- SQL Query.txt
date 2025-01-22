@@ -1,0 +1,91 @@
+
+SECOND SECTION
+
+
+CLOSED ENDED: (2 Question covered)
+
+1.What are the top 5 brands by receipts scanned among users 21 and over?
+Answers:
+
+SELECT 
+    p.BRAND, 
+    SUM(t.FINAL_SALE) AS total_sales
+FROM 
+    TRANSACTION_TAKEHOME t
+JOIN 
+    PRODUCTS_TAKEHOME p 
+    ON t.BARCODE = p.BARCODE
+JOIN 
+    USER_TAKEHOME u 
+    ON t.USER_ID = u.ID
+WHERE 
+     (julianday('now') - julianday(BIRTH_DATE))  >= 6 * 30  and brand <> ‘’
+GROUP BY 
+    p.BRAND
+ORDER BY 
+    total_sales DESC
+LIMIT 5;
+
+SELECT 
+    p.BRAND, 
+    ROUND(SUM(t.FINAL_SALE), 2) AS total_sales
+FROM 
+    TRANSACTION_TAKEHOME t
+JOIN 
+    PRODUCTS_TAKEHOME p 
+    ON t.BARCODE = p.BARCODE
+JOIN 
+    USER_TAKEHOME u 
+    ON t.USER_ID = u.ID
+WHERE 
+    (julianday('now') - julianday(u.BIRTH_DATE)) >= 6 * 30  -- Users active for at least 6 months
+    AND p.BRAND <> ''  -- Exclude empty brand names
+GROUP BY 
+    p.BRAND
+ORDER BY 
+    total_sales DESC
+LIMIT 5;
+
+
+
+2.What are the top 5 brands by sales among users that have had their account for at least six months?
+
+Answers :
+
+SELECT p.BRAND, COUNT(DISTINCT t.RECEIPT_ID) AS receipts_scanned FROM TRANSACTION_TAKEHOME t JOIN  PRODUCTS_TAKEHOME p 
+   ON t.BARCODE = p.BARCODE JOIN  USER_TAKEHOME u ON t.USER_ID = u.ID WHERE   (julianday('now') - julianday(BIRTH_DATE)) / 365.25 >= 21  and brand <> '' -- Exclude empty brand names
+GROUP BY  p.BRAND ORDER BY receipts_scanned DESC LIMIT 5
+
+
+
+
+
+***************************************
+
+
+
+
+
+OPEN ENDED (One question covered)
+
+1. Who are Fetch’s power users?
+Answer:
+
+SELECT 
+    u.ID AS User_ID, 
+    COUNT(DISTINCT t.RECEIPT_ID) AS Total_Receipts_Scanned, 
+    SUM(t.FINAL_SALE) AS Total_Sales
+FROM 
+    TRANSACTION_TAKEHOME t
+JOIN 
+    USER_TAKEHOME u 
+    ON t.USER_ID = u.ID
+GROUP BY 
+    u.ID
+ORDER BY 
+    Total_Sales DESC, 
+    Total_Receipts_Scanned DESC
+LIMIT 10; -- Top 10 power users
+
+Explanation : This SQL query identifies Fetch's top 10 power users by evaluating their activity and sales contributions. It calculates the total receipts scanned and total sales per user, sorts the results by highest total sales first, and resolves ties by the number of receipts scanned. The LIMIT 10 ensures only the top 10 users are included in the results. Power users are thus defined as those contributing the most sales and activity.
+
